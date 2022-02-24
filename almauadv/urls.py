@@ -6,6 +6,8 @@ from app.views import (
     delete,
     add_car,
     car_trips,
+    submit_trip,
+    delete_trip
 )
 
 urlpatterns = [
@@ -13,5 +15,8 @@ urlpatterns = [
     path('delete/<str:id_>', delete),
     path('add_car/', add_car),
     path('cars/<int:id_>', car_trips),
+    path('submit_trip/', submit_trip),
+    path('delete_trip/<str:id_>', delete_trip),
+
     path('admin777/', admin.site.urls),
 ]
