@@ -1,22 +1,22 @@
 from django.contrib import admin  # type: ignore
 from django.http import HttpRequest, HttpResponse  # type: ignore
 from django.urls import path  # type: ignore
-from app.views import (
+from app.views_cars import (
     index,
     delete,
     add_car,
+)
+
+from app.views_trips import (
     car_trips,
-    submit_trip,
-    delete_trip
+    car_trips_delete,
 )
 
 urlpatterns = [
     path('', index),
     path('delete/<str:id_>', delete),
     path('add_car/', add_car),
-    path('cars/<int:id_>', car_trips),
-    path('submit_trip/', submit_trip),
-    path('delete_trip/<str:id_>', delete_trip),
-
-    path('admin777/', admin.site.urls),
+    path('cars/<int:car_id>/trips', car_trips),
+    path('delete_trip/<int:trip_id>', car_trips_delete),
+    path('admin/', admin.site.urls),
 ]
