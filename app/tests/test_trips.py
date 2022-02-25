@@ -99,55 +99,32 @@ class TestTrips(TestCase):
         # Create car
         c = Client()
         response = c.get("/")
-        assert "cars" in response.context
-        number_of_cars = len(response.context["cars"])
         response = c.post("/add_car/", {
             "model": "Porsche",
             "speed": 340,
             "color": "red",
         })
-        assert isinstance(response, HttpResponseRedirect)
-        assert response.url == "/"
 
         cars_response = c.get("/")
-        assert "cars" in cars_response.context
-        self.assertEquals(len(cars_response.context["cars"]), number_of_cars + 1)
-        assert 'button onclick="delete_car' in cars_response.content.decode("UTF8")
-        assert cars_number(
-            cars=cars_response.context["cars"],
-            model="Porsche",
-            speed=340,
-            color="red",
-        ) == 1
-        # Get car 
         car = get_car(cars=cars_response.context["cars"],
             model="Porsche",
             speed=340,
             color="red")
-        assert car.id is not None
 
         # Context validation
         response = c.get(f"/cars/{car.id}/trips")
-        assert "trips" in response.context
-        assert "car" in response.context
 
         # Create trip
         response = c.post(f"/cars/{car.id}/trips", {
             "trip_km": 100,
             "trip_date": "2020-01-01",
         })
-        assert isinstance(response, HttpResponseRedirect)
 
         # Context validation
         response = c.get(f"/cars/{car.id}/trips")
-        assert "trips" in response.context
-        assert "car" in response.context
-        # Check trip
-        assert trips_number(trips=response.context["trips"], car_id=car.id) == 1
 
         # Get trip
         trip = get_trip(trips=response.context["trips"], date="2020-01-01", km=100)
-        assert trip.id is not None
 
         # Delete trip
         response = c.delete(f'/delete_trip/{trip.id}')
@@ -157,64 +134,37 @@ class TestTrips(TestCase):
         assert trips_number(trips=response.context["trips"], car_id=car.id) == 0
 
     def test_edit_trip(self):
-        # Create car
+        # Create client
         c = Client()
+        # Get cars
         response = c.get("/")
-        assert "cars" in response.context
-        number_of_cars = len(response.context["cars"])
+        # Create car
         response = c.post("/add_car/", {
             "model": "Porsche",
             "speed": 340,
             "color": "red",
         })
-        assert isinstance(response, HttpResponseRedirect)
-        assert response.url == "/"
-
+        # Get created car
         cars_response = c.get("/")
-        assert "cars" in cars_response.context
-        self.assertEquals(len(cars_response.context["cars"]), number_of_cars + 1)
-        assert 'button onclick="delete_car' in cars_response.content.decode("UTF8")
-        assert cars_number(
-            cars=cars_response.context["cars"],
-            model="Porsche",
-            speed=340,
-            color="red",
-        ) == 1
-        # Get car 
         car = get_car(cars=cars_response.context["cars"],
             model="Porsche",
             speed=340,
             color="red")
-        assert car.id is not None
-
-        # Context validation
-        response = c.get(f"/cars/{car.id}/trips")
-        assert "trips" in response.context
-        assert "car" in response.context
-
         # Create trip
         response = c.post(f"/cars/{car.id}/trips", {
             "trip_km": 100,
             "trip_date": "2020-01-01",
         })
-        assert isinstance(response, HttpResponseRedirect)
-
-        # Context validation
+        # Get created trip
         response = c.get(f"/cars/{car.id}/trips")
-        assert "trips" in response.context
-        assert "car" in response.context
-        # Check trip
-        assert trips_number(trips=response.context["trips"], car_id=car.id) == 1
-
-        # Get trip
         trip = get_trip(trips=response.context["trips"], date="2020-01-01", km=100)
-        assert trip.id is not None
 
         updated_trip = {
             "id_": trip.id,
             "trip_km": 123,
             "trip_date": "2020-01-02",
         }
+        # Update trip
         c.post(f"/cars/{car.id}/trips", updated_trip)
 
         response = c.get(f"/cars/{car.id}/trips")
